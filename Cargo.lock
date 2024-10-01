@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "address-validator"
+name = "address_checksum"
 version = "0.1.0"
 dependencies = [
  "regex",
