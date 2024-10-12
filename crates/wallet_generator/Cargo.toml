@@ -1,0 +1,10 @@
+[package]
+name = "wallet_generator"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+alloy = "0.4.2"
+lazy_static = "1.5.0"
+rand = "0.8.5"
+secp256k1 = "0.30.0"
