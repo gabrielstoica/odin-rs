@@ -2916,11 +2916,13 @@ name = "wallet_generator"
 version = "0.1.0"
 dependencies = [
  "alloy",
+ "hex",
  "lazy_static",
  "num-bigint",
  "rand 0.8.5",
  "rust-crypto",
  "secp256k1",
+ "sha3",
 ]
 
 [[package]]
