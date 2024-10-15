@@ -1,118 +1,112 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
-use alloy::primitives::U256;
-use rand::Rng;
+use num_bigint::{BigInt, RandBigInt};
+use rand::thread_rng;
 
-#[derive(Debug)]
-struct Point {
-    x: U256,
-    y: U256,
+#[derive(Debug, Clone)]
+pub struct Point {
+    pub x: BigInt,
+    pub y: BigInt,
 }
 
-fn mod_inv(a: U256, prime: U256) -> U256 {
+fn modular_inverse(a: BigInt, modulus: &BigInt) -> BigInt {
     // Use the extended Euclidean algorithm to find the modular inverse
-    a.pow_mod(U256::from(prime - U256::from(2)), prime) // Fermat's Little Theorem
+    // Fermat's Little Theorem
+    a.modpow(&BigInt::from(modulus - BigInt::from(2)), &modulus)
 }
 
-// lambda = (q.y - p.y) / (q.x - p.x)
-// x_r = lambda^2 - p.x - q.x
-// y_r = lambda * (p.x - x_r) - p.y
-fn add(p: &Point, q: &Point) -> Point {
-    let prime: U256 = U256::from_str_radix(
-        "fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f",
-        16,
-    )
-    .unwrap();
-
-    let lambda = ((q.y - p.y) * mod_inv(q.x - p.x, prime)) % prime;
-    let r_x = (lambda.pow(U256::from(2)) - p.x - q.x) % prime;
-    let r_y = (lambda * (p.x - r_x) - p.y) % prime;
-
-    return Point { x: r_x, y: r_y };
-}
-
-// lambda = 3 * (x1^2) / 2 * y1
-// r_x = lambda^2 - 2*x1
-// r_y = lambda * (x1 - r_x) - y1
-fn double(p: Point) -> Point {
-    let prime: U256 = U256::from_str_radix(
-        "fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f",
-        16,
-    )
-    .unwrap();
-
-    let lambda =
-        ((U256::from(3) * p.x.pow(U256::from(2))) * mod_inv(U256::from(2) * p.y, prime)) % prime;
-    let r_x = (lambda.pow(U256::from(2)) - (U256::from(2) * p.x)) % prime;
-    let r_y = (lambda * (p.x - r_x) - p.y) % prime;
-
-    return Point { x: r_x, y: r_y };
-}
-
-fn multiply_scalar(k: U256, g: Point) -> Point {
-    let mut q = Point {
-        x: U256::ZERO,
-        y: U256::ZERO,
-    };
-    let mut g_clone = g;
-
-    for i in 0..256 {
-        if k.bit(i) {
-            q = add(&q, &g_clone);
-        }
-
-        g_clone = double(g_clone);
+/// lambda = (q.y - p.y) / (q.x - p.x)
+/// x_r = lambda^2 - p.x - q.x
+/// y_r = lambda * (p.x - x_r) - p.y
+fn add(p1: &Point, p2: &Point) -> Point {
+    if p1.x == p2.x && p1.y == p2.y {
+        return double(p1.clone());
     }
 
-    return q;
+    let modulus: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
+
+    let inv = modular_inverse(&p1.x - &p2.x, &modulus);
+
+    let lambda = ((&p1.y - &p2.y) * inv) % &modulus;
+    let x3 = (lambda.pow(2) - &p1.x - &p2.x) % &modulus;
+    let y3 = (lambda * (&p1.x - &x3) - &p1.y) % &modulus;
+
+    return Point { x: x3, y: y3 };
 }
 
+/// lambda = 3 * (x1^2) / 2 * y1
+/// r_x = lambda^2 - 2*x1
+/// r_y = lambda * (x1 - r_x) - y1
+fn double(p: Point) -> Point {
+    let modulus: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
+
+    let lambda: BigInt = ((3 * p.x.modpow(&BigInt::from(2), &modulus))
+        * modular_inverse(2 * &p.y, &modulus))
+        % &modulus;
+
+    let x3: BigInt = (lambda.pow(2) - 2 * &p.x) % &modulus;
+    let y3: BigInt = (lambda * (&p.x - &x3) - p.y) % &modulus;
+
+    return Point { x: x3, y: y3 };
+}
+
+fn multiply_scalar(k: BigInt, p: Point) -> Point {
+    let mut result = p.clone();
+    let bit_length = k.bits();
+
+    // Reverse loop as the number is represented in little endian
+    // and we want to parse it in big endian
+    // Example:
+    // 5555 -> 1010110110011 (binary) in big endian
+    // but without the reverse loop it will be parsed
+    // as 1100110110101 (binary) in little endian
+    for i in (0..bit_length - 1).rev() {
+        result = double(result);
+
+        if k.bit(i) {
+            result = add(&result, &p);
+        }
+    }
+
+    return result;
+}
+
+/// secp256k1 curve parameters
+/// Order
+const N: &str = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
+/// Field
+const P: &str = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F";
+/// Generator point
+const G_X: &str = "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798";
+const G_Y: &str = "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8";
+
+/// Generate a random number k.
+/// Multiply k with the generator point G, resulting in another point on the curve
+/// which is the public key K.
+/// K = k * G
 fn main() {
-    // generate a random number k
-    // multiply k with a predetermined point on the curve
-    // called the generator point G -> resulting in another point on the curve
-    // which is the public key K
-    // K = k * G
+    // Define the total number of points on the curve
+    let max_range = BigInt::parse_bytes(N.as_bytes(), 16).unwrap();
 
-    let mut rng = rand::thread_rng();
-    let random_bytes: [u8; 32] = rng.gen::<[u8; 32]>();
+    // Create the random number generator
+    let mut rng = thread_rng();
 
-    //let k = U256::from_be_bytes(random_bytes);
-    let k = U256::from_str_radix(
-        "f8f8a2f43c8376ccb0871305060d7b27b0554d2cc72bccf41b2705608452f315",
-        16,
-    )
-    .unwrap();
+    // Generate a random number k in range 1 -> number of points on the curve (N)
+    let k = rng.gen_bigint_range(&BigInt::from(1), &max_range);
 
-    let g_x = U256::from_str_radix(
-        "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-        16,
-    )
-    .unwrap();
+    // Construct the generator point G
+    let g = Point {
+        x: BigInt::parse_bytes(G_X.as_bytes(), 16).unwrap(),
+        y: BigInt::parse_bytes(G_Y.as_bytes(), 16).unwrap(),
+    };
 
-    let g_y = U256::from_str_radix(
-        "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8",
-        16,
-    )
-    .unwrap();
-
-    let g = Point { x: g_x, y: g_y };
-
+    // Compute the public key by multiplying the random number k with the generator point G
     let pub_key = multiply_scalar(k, g);
 
-    // serialize public key
-
-    /*  let pub_key_x = U256::to_string(&pub_key.x);
-       let pub_key_y = U256::to_string(&pub_key.y);
-
-       let serialized_pub_key = format!("04{pub_key_x}{pub_key_y}");
-    */
-
-    // serialize public key as hexadecimal
+    // Serialize public key as hexadecimal and add `0x04` prefix
     let pub_key_x = format!("{:064x}", pub_key.x); // 64 characters for 32 bytes
-    let pub_key_y = format!("{:064x}", pub_key.y); // 64 characters for 32 bytes
+    let pub_key_y: String = format!("{:064x}", pub_key.y); // 64 characters for 32 bytes
 
-    let serialized_pub_key = format!("04{}{}", pub_key_x, pub_key_y);
-
-    println!("{:?}", serialized_pub_key);
+    // 04 + x-coordinate (32 bytes/64 hex) + y-coordinate (32 bytes/64 hex)
+    println!("{:?}", format!("04{}{}", pub_key_x, pub_key_y));
 }
