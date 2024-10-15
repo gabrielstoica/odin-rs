@@ -2,6 +2,9 @@
 #![allow(unused_variables)]
 use num_bigint::{BigInt, RandBigInt};
 use rand::thread_rng;
+use sha3::{Digest, Keccak256};
+
+mod test;
 
 #[derive(Debug, Clone)]
 pub struct Point {
@@ -101,12 +104,26 @@ fn main() {
     };
 
     // Compute the public key by multiplying the random number k with the generator point G
-    let pub_key = multiply_scalar(k, g);
+    let pub_key_point = multiply_scalar(k, g);
 
     // Serialize public key as hexadecimal and add `0x04` prefix
-    let pub_key_x = format!("{:064x}", pub_key.x); // 64 characters for 32 bytes
-    let pub_key_y: String = format!("{:064x}", pub_key.y); // 64 characters for 32 bytes
+    let pub_key_x = format!("{:064x}", pub_key_point.x);
+    let pub_key_y: String = format!("{:064x}", pub_key_point.y);
 
     // 04 + x-coordinate (32 bytes/64 hex) + y-coordinate (32 bytes/64 hex)
-    println!("{:?}", format!("04{}{}", pub_key_x, pub_key_y));
+    // println!("{:?}", format!("04{}{}", pub_key_x, pub_key_y));
+
+    let pub_key_concat = [pub_key_x, pub_key_y].concat();
+
+    // Convert the concatenated hex string to raw bytes
+    let pub_key_concat_as_bytes = hex::decode(pub_key_concat).expect("Decoding failed");
+
+    // Hash the public key (X and Y coordinates concatenated) using keccak256
+    let mut hasher = Keccak256::new();
+    hasher.update(pub_key_concat_as_bytes);
+    let result = hasher.finalize();
+
+    // Get the last 20 bytes and display it in hex
+    let address_bytes = &result[12..];
+    println!("{}", format!("0x{}", hex::encode(result)));
 }
