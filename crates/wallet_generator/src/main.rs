@@ -33,12 +33,15 @@ fn add(p1: &Point, p2: &Point) -> Point {
 
     let lambda = ((&p1.y - &p2.y) * inv) % &modulus;
     let x3 = (lambda.pow(2) - &p1.x - &p2.x) % &modulus;
-    let y3 = (lambda * (&p1.x - &x3) - &p1.y) % &modulus;
+    // Note: in Rust, -2 mod 7 = -2, therefore we have to add modulus to the result to get
+    // the correct positive coordinate (-2 + 7 = 5); this does not affect the result if the
+    // coordinate is already positive, example:
+    // (a + p) mod p == a mod p
+    // 4 mod 7 = 4 -> 4 + 7 mod 7 = 4
+    let y3 = ((lambda * (&p1.x - &x3) - &p1.y) % &modulus + &modulus) % &modulus;
 
-    return Point {
-        x: &x3 & &modulus,
-        y: &y3 & &modulus,
-    };
+    // Use modulo again to ensure no negative coordinates are returned
+    return Point { x: x3, y: y3 };
 }
 
 /// lambda = 3 * (x1^2) / 2 * y1
@@ -52,12 +55,15 @@ fn double(p: Point) -> Point {
         % &modulus;
 
     let x3: BigInt = (lambda.pow(2) - 2 * &p.x) % &modulus;
-    let y3: BigInt = (lambda * (&p.x - &x3) - p.y) % &modulus;
+    // Note: in Rust, -2 mod 7 = -2, therefore we have to add modulus to the result to get
+    // the correct positive coordinate (-2 + 7 = 5); this does not affect the result if the
+    // coordinate is already positive, example:
+    // (a + p) mod p == a mod p
+    // 4 mod 7 = 4 -> 4 + 7 mod 7 = 4
+    let y3: BigInt = ((lambda * (&p.x - &x3) - p.y) % &modulus) + &modulus;
 
-    return Point {
-        x: &x3 & &modulus,
-        y: &y3 & &modulus,
-    };
+    // Use modulo again to ensure no negative coordinates are returned
+    return Point { x: x3, y: y3 };
 }
 
 fn multiply_scalar(k: BigInt, p: Point) -> Point {
@@ -119,9 +125,15 @@ fn main() {
     // Create the random number generator
     let mut rng = thread_rng();
 
-    for i in 0..no_of_addresses_to_generate {
+    for i in 1..no_of_addresses_to_generate + 1 {
+        println!(
+            "-------------------------------Address #{}-------------------------------",
+            i
+        );
+
         // Generate a random number k in range 1 -> number of points on the curve (N)
         let k = rng.gen_bigint_range(&BigInt::from(1), &max_range);
+        println!("Private key: {}", format!("{:x}", k));
 
         // Construct the generator point G
         let g = Point {
@@ -135,10 +147,9 @@ fn main() {
         // Serialize public key as hexadecimal
         let pub_key_x = format!("{:06x}", pub_key_point.x);
         let pub_key_y: String = format!("{:06x}", pub_key_point.y);
-        println!("{}{}", pub_key_x, pub_key_y);
 
         // 04 + x-coordinate (32 bytes/64 hex) + y-coordinate (32 bytes/64 hex)
-        // println!("{:?}", format!("04{}{}", pub_key_x, pub_key_y));
+        println!("Public key: {:?}", format!("{}{}", pub_key_x, pub_key_y));
 
         let mut pub_key_concat = [pub_key_x, pub_key_y].concat();
 
@@ -157,6 +168,11 @@ fn main() {
 
         // Get the last 20 bytes and display it in hex
         let address_bytes = &result[12..];
-        println!("{}", format!("0x{}", hex::encode(result)));
+        println!(
+            "Ethereum address: {}",
+            format!("0x{}", hex::encode(address_bytes))
+        );
+
+        println!("------------------------------------------------------------------------\n");
     }
 }
