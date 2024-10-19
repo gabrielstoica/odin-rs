@@ -11,7 +11,7 @@ fn main() {
 
     // validate if the provided address is a valid Ethereum address
     let regex = Regex::new(r"^0x[a-fA-F0-9]{40}$").unwrap();
-    if !regex.is_match(&address) {
+    if !regex.is_match(address) {
         println!("You have provided an invalid Ethereum address!");
         return;
     }

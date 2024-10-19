@@ -16,7 +16,7 @@ pub struct Point {
 fn modular_inverse(a: BigInt, modulus: &BigInt) -> BigInt {
     // Use the extended Euclidean algorithm to find the modular inverse
     // Fermat's Little Theorem
-    a.modpow(&BigInt::from(modulus - BigInt::from(2)), &modulus)
+    a.modpow(&(modulus - BigInt::from(2)), modulus)
 }
 
 /// lambda = (q.y - p.y) / (q.x - p.x)
@@ -41,7 +41,7 @@ fn add(p1: &Point, p2: &Point) -> Point {
     let y3 = ((lambda * (&p1.x - &x3) - &p1.y) % &modulus + &modulus) % &modulus;
 
     // Use modulo again to ensure no negative coordinates are returned
-    return Point { x: x3, y: y3 };
+    Point { x: x3, y: y3 }
 }
 
 /// lambda = 3 * (x1^2) / 2 * y1
@@ -63,7 +63,7 @@ fn double(p: Point) -> Point {
     let y3: BigInt = ((lambda * (&p.x - &x3) - p.y) % &modulus) + &modulus;
 
     // Use modulo again to ensure no negative coordinates are returned
-    return Point { x: x3, y: y3 };
+    Point { x: x3, y: y3 }
 }
 
 fn multiply_scalar(k: BigInt, p: Point) -> Point {
@@ -84,7 +84,7 @@ fn multiply_scalar(k: BigInt, p: Point) -> Point {
         }
     }
 
-    return result;
+    result
 }
 
 /// secp256k1 curve parameters
@@ -133,7 +133,7 @@ fn main() {
 
         // Generate a random number k in range 1 -> number of points on the curve (N)
         let k = rng.gen_bigint_range(&BigInt::from(1), &max_range);
-        println!("Private key: {}", format!("{:x}", k));
+        println!("Private key: {:x}", k);
 
         // Construct the generator point G
         let g = Point {
@@ -168,10 +168,7 @@ fn main() {
 
         // Get the last 20 bytes and display it in hex
         let address_bytes = &result[12..];
-        println!(
-            "Ethereum address: {}",
-            format!("0x{}", hex::encode(address_bytes))
-        );
+        println!("Ethereum address: 0x{}", hex::encode(address_bytes));
 
         println!("------------------------------------------------------------------------\n");
     }
