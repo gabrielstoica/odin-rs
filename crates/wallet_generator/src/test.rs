@@ -1,5 +1,15 @@
 #![allow(unused_imports)]
 use super::*;
+use wallet_generator::{add, double, modular_inverse, multiply_scalar};
+
+/// secp256k1 curve parameters
+/// Order
+const N: &str = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
+/// Field
+const P: &str = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F";
+/// Generator point
+const G_X: &str = "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798";
+const G_Y: &str = "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8";
 
 #[test]
 fn test_add() {
@@ -49,7 +59,7 @@ fn test_add() {
     };
     println!("{:?}", expected);
 
-    let actual = add(&p1, &p2);
+    let actual = add(P, &p1, &p2);
     assert_eq!(actual.x, expected.x);
 }
 
@@ -86,7 +96,7 @@ fn test_double() {
     };
     println!("{:?}", expected);
 
-    let actual = double(p1);
+    let actual = double(P, p1);
     assert_eq!(actual.x, expected.x);
 }
 
@@ -131,7 +141,7 @@ fn test_multiply_scalar() {
         .unwrap(),
     };
 
-    let actual = multiply_scalar(k, g);
+    let actual = multiply_scalar(P, k, g);
     assert_eq!(actual.x, expected.x);
 }
 
@@ -170,7 +180,7 @@ fn test_multiply_big_scalar() {
         .unwrap(),
     };
 
-    let actual = multiply_scalar(k, g);
+    let actual = multiply_scalar(P, k, g);
     assert_eq!(actual.x, expected.x);
     assert_eq!(actual.y, expected.y);
 }
