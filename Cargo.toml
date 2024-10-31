@@ -1,2 +1,2 @@
 [workspace]
-members = ["crates/address_checksum", "crates/wallet_generator"]
+members = ["address_checksum", "wallet_generator"]
