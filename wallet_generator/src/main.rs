@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
-use eliptic_curve_math::{multiply_scalar, Point};
+use elliptic_curve_math::{multiply_scalar, Point};
 use num_bigint::{BigInt, RandBigInt};
 use rand::thread_rng;
 use sha3::{Digest, Keccak256};

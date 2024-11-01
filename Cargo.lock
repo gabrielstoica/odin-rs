@@ -107,7 +107,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "eliptic_curve_math"
+name = "elliptic_curve_math"
 version = "0.1.0"
 dependencies = [
  "num-bigint",
@@ -449,7 +449,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 name = "wallet_generator"
 version = "0.1.0"
 dependencies = [
- "eliptic_curve_math",
+ "elliptic_curve_math",
  "hex",
  "lazy_static",
  "num-bigint",
