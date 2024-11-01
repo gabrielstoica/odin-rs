@@ -1,12 +1,10 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
+use eliptic_curve_math::{multiply_scalar, Point};
 use num_bigint::{BigInt, RandBigInt};
 use rand::thread_rng;
 use sha3::{Digest, Keccak256};
 use std::env;
-use wallet_generator::{multiply_scalar, Point};
-
-mod test;
 
 /// secp256k1 curve parameters
 /// Order
@@ -16,6 +14,10 @@ const P: &str = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2
 /// Generator point
 const G_X: &str = "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798";
 const G_Y: &str = "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8";
+/// a coefficient
+const A: &str = "0000000000000000000000000000000000000000000000000000000000000000";
+/// b coefficient
+const B: &str = "0000000000000000000000000000000000000000000000000000000000000007";
 
 /// Generate a random number k.
 /// Multiply k with the generator point G, resulting in another point on the curve
@@ -46,6 +48,9 @@ fn main() {
     // Create the random number generator
     let mut rng = thread_rng();
 
+    // Convert curve `a` field to BigInt
+    let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+
     for i in 0..no_of_addresses_to_generate {
         println!(
             "-------------------------------Address #{}-------------------------------",
@@ -63,7 +68,7 @@ fn main() {
         };
 
         // Compute the public key by multiplying the random number k with the generator point G
-        let pub_key_point = multiply_scalar(P, k, g);
+        let pub_key_point = multiply_scalar(P, &a, &k, &g);
 
         // Serialize public key as hexadecimal
         let pub_key_x = format!("{:06x}", pub_key_point.x);

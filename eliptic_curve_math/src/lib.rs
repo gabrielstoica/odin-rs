@@ -15,9 +15,9 @@ pub fn modular_inverse(a: BigInt, modulus: &BigInt) -> BigInt {
 /// lambda = (q.y - p.y) / (q.x - p.x)
 /// x_r = lambda^2 - p.x - q.x
 /// y_r = lambda * (p.x - x_r) - p.y
-pub fn add(field: &str, p1: &Point, p2: &Point) -> Point {
+pub fn add(field: &str, a: &BigInt, p1: &Point, p2: &Point) -> Point {
     if p1.x == p2.x && p1.y == p2.y {
-        return double(field, p1.clone());
+        return double(field, a, p1);
     }
 
     let modulus: BigInt = BigInt::parse_bytes(field.as_bytes(), 16).unwrap();
@@ -37,13 +37,13 @@ pub fn add(field: &str, p1: &Point, p2: &Point) -> Point {
     Point { x: x3, y: y3 }
 }
 
-/// lambda = 3 * (x1^2) / 2 * y1
+/// lambda = (3 * x1^2 + a) / 2 * y1
 /// r_x = lambda^2 - 2*x1
 /// r_y = lambda * (x1 - r_x) - y1
-pub fn double(field: &str, p: Point) -> Point {
+pub fn double(field: &str, a: &BigInt, p: &Point) -> Point {
     let modulus: BigInt = BigInt::parse_bytes(field.as_bytes(), 16).unwrap();
 
-    let lambda: BigInt = ((3 * p.x.modpow(&BigInt::from(2), &modulus))
+    let lambda: BigInt = (((3 * p.x.modpow(&BigInt::from(2), &modulus)) + a)
         * modular_inverse(2 * &p.y, &modulus))
         % &modulus;
 
@@ -53,13 +53,13 @@ pub fn double(field: &str, p: Point) -> Point {
     // coordinate is already positive, example:
     // (a + p) mod p == a mod p
     // 4 mod 7 = 4 -> 4 + 7 mod 7 = 4
-    let y3: BigInt = ((lambda * (&p.x - &x3) - p.y) % &modulus) + &modulus;
+    let y3: BigInt = ((lambda * (&p.x - &x3) - &p.y) % &modulus) + &modulus;
 
     // Use modulo again to ensure no negative coordinates are returned
     Point { x: x3, y: y3 }
 }
 
-pub fn multiply_scalar(field: &str, k: BigInt, p: Point) -> Point {
+pub fn multiply_scalar(field: &str, a: &BigInt, k: &BigInt, p: &Point) -> Point {
     let mut result = p.clone();
     let bit_length = k.bits();
 
@@ -70,10 +70,10 @@ pub fn multiply_scalar(field: &str, k: BigInt, p: Point) -> Point {
     // but without the reverse loop it will be parsed
     // as 1100110110101 (binary) in little endian
     for i in (0..bit_length - 1).rev() {
-        result = double(field, result);
+        result = double(&field, &a, &result);
 
         if k.bit(i) {
-            result = add(field, &result, &p);
+            result = add(&field, &a, &result, &p);
         }
     }
 

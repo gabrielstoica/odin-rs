@@ -3,6 +3,8 @@ use super::*;
 use wallet_generator::{add, double, modular_inverse, multiply_scalar};
 
 /// secp256k1 curve parameters
+/// y^2 = x^3 + a*x + b
+///
 /// Order
 const N: &str = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";
 /// Field
@@ -10,6 +12,10 @@ const P: &str = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2
 /// Generator point
 const G_X: &str = "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798";
 const G_Y: &str = "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8";
+/// a coefficient
+const A: &str = "0000000000000000000000000000000000000000000000000000000000000000";
+/// b coefficient
+const B: &str = "0000000000000000000000000000000000000000000000000000000000000007";
 
 #[test]
 fn test_add() {
@@ -59,7 +65,10 @@ fn test_add() {
     };
     println!("{:?}", expected);
 
-    let actual = add(P, &p1, &p2);
+    // Convert curve `a` field to BigInt
+    let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+
+    let actual = add(P, &a, &p1, &p2);
     assert_eq!(actual.x, expected.x);
 }
 
@@ -96,7 +105,10 @@ fn test_double() {
     };
     println!("{:?}", expected);
 
-    let actual = double(P, p1);
+    // Convert curve `a` field to BigInt
+    let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+
+    let actual = double(&P, &a, &p1);
     assert_eq!(actual.x, expected.x);
 }
 
@@ -141,7 +153,10 @@ fn test_multiply_scalar() {
         .unwrap(),
     };
 
-    let actual = multiply_scalar(P, k, g);
+    // Convert curve `a` field to BigInt
+    let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+
+    let actual = multiply_scalar(P, &a, &k, &g);
     assert_eq!(actual.x, expected.x);
 }
 
@@ -180,7 +195,10 @@ fn test_multiply_big_scalar() {
         .unwrap(),
     };
 
-    let actual = multiply_scalar(P, k, g);
+    // Convert curve `a` field to BigInt
+    let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+
+    let actual = multiply_scalar(P, &a, &k, &g);
     assert_eq!(actual.x, expected.x);
     assert_eq!(actual.y, expected.y);
 }
