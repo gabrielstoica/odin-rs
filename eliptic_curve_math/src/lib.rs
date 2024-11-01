@@ -1,5 +1,7 @@
 use num_bigint::BigInt;
 
+mod test;
+
 #[derive(Debug, Clone)]
 pub struct Point {
     pub x: BigInt,
@@ -78,4 +80,10 @@ pub fn multiply_scalar(field: &str, a: &BigInt, k: &BigInt, p: &Point) -> Point 
     }
 
     result
+}
+
+pub fn verify_signature() -> String {
+    let message = "test";
+
+    String::from(message)
 }

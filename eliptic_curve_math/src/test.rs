@@ -1,6 +1,6 @@
 #![allow(unused_imports)]
+#![allow(dead_code)]
 use super::*;
-use wallet_generator::{add, double, modular_inverse, multiply_scalar};
 
 /// secp256k1 curve parameters
 /// y^2 = x^3 + a*x + b
