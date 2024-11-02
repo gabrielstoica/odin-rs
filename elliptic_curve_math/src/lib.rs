@@ -8,7 +8,7 @@ pub struct Point {
     pub y: BigInt,
 }
 
-pub fn modular_inverse(a: BigInt, modulus: &BigInt) -> BigInt {
+pub fn modular_inverse(a: &BigInt, modulus: &BigInt) -> BigInt {
     // Use the extended Euclidean algorithm to find the modular inverse
     // Fermat's Little Theorem
     a.modpow(&(modulus - BigInt::from(2)), modulus)
@@ -24,7 +24,7 @@ pub fn add(field: &str, a: &BigInt, p1: &Point, p2: &Point) -> Point {
 
     let modulus: BigInt = BigInt::parse_bytes(field.as_bytes(), 16).unwrap();
 
-    let inv = modular_inverse(&p1.x - &p2.x, &modulus);
+    let inv = modular_inverse(&(&p1.x - &p2.x), &modulus);
 
     let lambda = ((&p1.y - &p2.y) * inv) % &modulus;
     let x3 = (lambda.pow(2) - &p1.x - &p2.x) % &modulus;
@@ -33,7 +33,10 @@ pub fn add(field: &str, a: &BigInt, p1: &Point, p2: &Point) -> Point {
     // coordinate is already positive, example:
     // (a + p) mod p == a mod p
     // 4 mod 7 = 4 -> 4 + 7 mod 7 = 4
-    let y3 = ((lambda * (&p1.x - &x3) - &p1.y) % &modulus + &modulus) % &modulus;
+    let mut y3 = ((lambda * (&p1.x - &x3) - &p1.y) % &modulus) % &modulus;
+    if y3 < BigInt::from(0) {
+        y3 += &modulus;
+    }
 
     // Use modulo again to ensure no negative coordinates are returned
     Point { x: x3, y: y3 }
@@ -46,7 +49,7 @@ pub fn double(field: &str, a: &BigInt, p: &Point) -> Point {
     let modulus: BigInt = BigInt::parse_bytes(field.as_bytes(), 16).unwrap();
 
     let lambda: BigInt = (((3 * p.x.modpow(&BigInt::from(2), &modulus)) + a)
-        * modular_inverse(2 * &p.y, &modulus))
+        * modular_inverse(&(2 * &p.y), &modulus))
         % &modulus;
 
     let x3: BigInt = (lambda.pow(2) - 2 * &p.x) % &modulus;
@@ -55,7 +58,10 @@ pub fn double(field: &str, a: &BigInt, p: &Point) -> Point {
     // coordinate is already positive, example:
     // (a + p) mod p == a mod p
     // 4 mod 7 = 4 -> 4 + 7 mod 7 = 4
-    let y3: BigInt = ((lambda * (&p.x - &x3) - &p.y) % &modulus) + &modulus;
+    let mut y3: BigInt = (lambda * (&p.x - &x3) - &p.y) % &modulus;
+    if y3 < BigInt::from(0) {
+        y3 += &modulus;
+    }
 
     // Use modulo again to ensure no negative coordinates are returned
     Point { x: x3, y: y3 }
@@ -80,10 +86,4 @@ pub fn multiply_scalar(field: &str, a: &BigInt, k: &BigInt, p: &Point) -> Point 
     }
 
     result
-}
-
-pub fn verify_signature() -> String {
-    let message = "test";
-
-    String::from(message)
 }

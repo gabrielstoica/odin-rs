@@ -117,7 +117,7 @@ fn test_inverse() {
     let modulus: BigInt = BigInt::from(73);
     let a: BigInt = BigInt::from(17);
 
-    let inverse = modular_inverse(a, &modulus);
+    let inverse = modular_inverse(&a, &modulus);
     assert_eq!(inverse, BigInt::from(43));
 }
 
@@ -125,28 +125,34 @@ fn test_inverse() {
 fn test_multiply_scalar() {
     let g = Point {
         x: BigInt::parse_bytes(
-            "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798".as_bytes(),
-            16,
-        )
-        .unwrap(),
-        y: BigInt::parse_bytes(
-            "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8".as_bytes(),
-            16,
-        )
-        .unwrap(),
-    };
-
-    let k = BigInt::parse_bytes("5555".as_bytes(), 10).unwrap();
-
-    let expected = Point {
-        x: BigInt::parse_bytes(
-            "54976340765672169025649946224478388467109307527501050513432528676950419587142"
+            "85013610161300501634207097904060921905061818080704392857133632721418945641922"
                 .as_bytes(),
             10,
         )
         .unwrap(),
         y: BigInt::parse_bytes(
-            "67654079420216774832785791896316725322695534627465974655277300404003262897142"
+            "51484713442008819730592617749735375257932097210801086371214757216985020248059"
+                .as_bytes(),
+            10,
+        )
+        .unwrap(),
+    };
+
+    let k = BigInt::parse_bytes(
+        "51484713442008819730592617749735375257932097210801086371214757216985020248059".as_bytes(),
+        10,
+    )
+    .unwrap();
+
+    let expected = Point {
+        x: BigInt::parse_bytes(
+            "72352447593799398445922740549399987159431177238119866962767582363186985451835"
+                .as_bytes(),
+            10,
+        )
+        .unwrap(),
+        y: BigInt::parse_bytes(
+            "70185681729751987328402969426694159415632315296271757809744557899295792409494"
                 .as_bytes(),
             10,
         )
@@ -163,7 +169,7 @@ fn test_multiply_scalar() {
 /// See https://github.com/ethereumbook/ethereumbook/blob/develop/04keys-addresses.asciidoc#generating-a-public-key
 #[test]
 fn test_multiply_big_scalar() {
-    let g = Point {
+    let p = Point {
         x: BigInt::parse_bytes(
             "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798".as_bytes(),
             16,
@@ -198,7 +204,53 @@ fn test_multiply_big_scalar() {
     // Convert curve `a` field to BigInt
     let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
 
-    let actual = multiply_scalar(P, &a, &k, &g);
+    let actual = multiply_scalar(P, &a, &k, &p);
+    assert_eq!(actual.x, expected.x);
+    assert_eq!(actual.y, expected.y);
+}
+
+#[test]
+fn test_multiply_big_scalar2() {
+    let p = Point {
+        x: BigInt::parse_bytes(
+            "11557031742056114838734743550150354972631190840499583211275771016628870935876"
+                .as_bytes(),
+            10,
+        )
+        .unwrap(),
+        y: BigInt::parse_bytes(
+            "20930594233534484674627279732655251584241696903065387055974955470696465282724"
+                .as_bytes(),
+            10,
+        )
+        .unwrap(),
+    };
+
+    let k = BigInt::parse_bytes(
+        "11101893574081133653551597477754358047597243130607845565088874785568729948118".as_bytes(),
+        10,
+    )
+    .unwrap();
+
+    let expected = Point {
+        x: BigInt::parse_bytes(
+            "23466405427901064848765405310743290764804626857592401332662890160966721856561"
+                .as_bytes(),
+            10,
+        )
+        .unwrap(),
+        y: BigInt::parse_bytes(
+            "78018453005541465285293987897263501197917348599982509589975751894960449664440"
+                .as_bytes(),
+            10,
+        )
+        .unwrap(),
+    };
+
+    // Convert curve `a` field to BigInt
+    let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+
+    let actual = multiply_scalar(P, &a, &k, &p);
     assert_eq!(actual.x, expected.x);
     assert_eq!(actual.y, expected.y);
 }
