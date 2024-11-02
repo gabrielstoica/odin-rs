@@ -1,0 +1,8 @@
+[package]
+name = "secp256r1"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+elliptic_curve_math = { path = "../elliptic_curve_math" }
+num-bigint = "0.4.6"

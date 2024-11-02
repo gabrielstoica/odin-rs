@@ -371,6 +371,14 @@ checksum = "fe834bc780604f4674073badbad26d7219cadfb4a2275802db12cbae17498401"
 
 [[package]]
 name = "secp256k1"
+version = "0.1.0"
+dependencies = [
+ "elliptic_curve_math",
+ "num-bigint",
+]
+
+[[package]]
+name = "secp256k1"
 version = "0.30.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b50c5943d326858130af85e049f2661ba3c78b26589b8ab98e65e80ae44a1252"
@@ -387,6 +395,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d4387882333d3aa8cb20530a17c69a3752e97837832f34f6dccc760e715001d9"
 dependencies = [
  "cc",
+]
+
+[[package]]
+name = "secp256r1"
+version = "0.1.0"
+dependencies = [
+ "elliptic_curve_math",
+ "num-bigint",
 ]
 
 [[package]]
@@ -455,7 +471,7 @@ dependencies = [
  "num-bigint",
  "rand 0.8.5",
  "rust-crypto",
- "secp256k1",
+ "secp256k1 0.30.0",
  "sha3",
 ]
 

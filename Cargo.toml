@@ -1,2 +1,8 @@
 [workspace]
-members = ["address_checksum", "elliptic_curve_math", "wallet_generator"]
+members = [
+    "address_checksum",
+    "elliptic_curve_math",
+    "secp256r1",
+    "secp256k1",
+    "wallet_generator",
+]
