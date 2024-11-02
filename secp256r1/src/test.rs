@@ -39,6 +39,8 @@ fn test_verify_signature_secp256r1() {
 
     let modulus: BigInt = BigInt::parse_bytes(N.as_bytes(), 16).unwrap();
 
+    let field: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
+
     // Convert curve `a` field to BigInt
     let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
 
@@ -54,11 +56,11 @@ fn test_verify_signature_secp256r1() {
 
     let scalar_point_2 = (&s_inverse * &r) % &modulus;
 
-    let p1 = multiply_scalar(P, &a, &scalar_point_1, &g);
+    let p1 = multiply_scalar(&field, &a, &scalar_point_1, &g);
 
-    let p2 = multiply_scalar(P, &a, &scalar_point_2, &q);
+    let p2 = multiply_scalar(&field, &a, &scalar_point_2, &q);
 
-    let p3 = add(P, &a, &p1, &p2);
+    let p3 = add(&field, &a, &p1, &p2);
 
     assert_eq!(p3.x, r);
 }

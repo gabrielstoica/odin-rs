@@ -17,25 +17,25 @@ pub fn modular_inverse(a: &BigInt, modulus: &BigInt) -> BigInt {
 /// lambda = (q.y - p.y) / (q.x - p.x)
 /// x_r = lambda^2 - p.x - q.x
 /// y_r = lambda * (p.x - x_r) - p.y
-pub fn add(field: &str, a: &BigInt, p1: &Point, p2: &Point) -> Point {
+pub fn add(modulus: &BigInt, a: &BigInt, p1: &Point, p2: &Point) -> Point {
     if p1.x == p2.x && p1.y == p2.y {
-        return double(field, a, p1);
+        return double(modulus, a, p1);
     }
 
-    let modulus: BigInt = BigInt::parse_bytes(field.as_bytes(), 16).unwrap();
+    //let modulus: BigInt = BigInt::parse_bytes(field.as_bytes(), 16).unwrap();
 
     let inv = modular_inverse(&(&p1.x - &p2.x), &modulus);
 
-    let lambda = ((&p1.y - &p2.y) * inv) % &modulus;
-    let x3 = (lambda.pow(2) - &p1.x - &p2.x) % &modulus;
+    let lambda = ((&p1.y - &p2.y) * inv) % modulus;
+    let x3 = (lambda.pow(2) - &p1.x - &p2.x) % modulus;
     // Note: in Rust, -2 mod 7 = -2, therefore we have to add modulus to the result to get
     // the correct positive coordinate (-2 + 7 = 5); this does not affect the result if the
     // coordinate is already positive, example:
     // (a + p) mod p == a mod p
     // 4 mod 7 = 4 -> 4 + 7 mod 7 = 4
-    let mut y3 = ((lambda * (&p1.x - &x3) - &p1.y) % &modulus) % &modulus;
+    let mut y3 = ((lambda * (&p1.x - &x3) - &p1.y) % modulus) % modulus;
     if y3 < BigInt::from(0) {
-        y3 += &modulus;
+        y3 += modulus;
     }
 
     // Use modulo again to ensure no negative coordinates are returned
@@ -45,29 +45,29 @@ pub fn add(field: &str, a: &BigInt, p1: &Point, p2: &Point) -> Point {
 /// lambda = (3 * x1^2 + a) / 2 * y1
 /// r_x = lambda^2 - 2*x1
 /// r_y = lambda * (x1 - r_x) - y1
-pub fn double(field: &str, a: &BigInt, p: &Point) -> Point {
-    let modulus: BigInt = BigInt::parse_bytes(field.as_bytes(), 16).unwrap();
+pub fn double(modulus: &BigInt, a: &BigInt, p: &Point) -> Point {
+    //let modulus: BigInt = BigInt::parse_bytes(field.as_bytes(), 16).unwrap();
 
     let lambda: BigInt = (((3 * p.x.modpow(&BigInt::from(2), &modulus)) + a)
         * modular_inverse(&(2 * &p.y), &modulus))
-        % &modulus;
+        % modulus;
 
-    let x3: BigInt = (lambda.pow(2) - 2 * &p.x) % &modulus;
+    let x3: BigInt = (lambda.pow(2) - 2 * &p.x) % modulus;
     // Note: in Rust, -2 mod 7 = -2, therefore we have to add modulus to the result to get
     // the correct positive coordinate (-2 + 7 = 5); this does not affect the result if the
     // coordinate is already positive, example:
     // (a + p) mod p == a mod p
     // 4 mod 7 = 4 -> 4 + 7 mod 7 = 4
-    let mut y3: BigInt = (lambda * (&p.x - &x3) - &p.y) % &modulus;
+    let mut y3: BigInt = (lambda * (&p.x - &x3) - &p.y) % modulus;
     if y3 < BigInt::from(0) {
-        y3 += &modulus;
+        y3 += modulus;
     }
 
     // Use modulo again to ensure no negative coordinates are returned
     Point { x: x3, y: y3 }
 }
 
-pub fn multiply_scalar(field: &str, a: &BigInt, k: &BigInt, p: &Point) -> Point {
+pub fn multiply_scalar(field: &BigInt, a: &BigInt, k: &BigInt, p: &Point) -> Point {
     let mut result = p.clone();
     let bit_length = k.bits();
 

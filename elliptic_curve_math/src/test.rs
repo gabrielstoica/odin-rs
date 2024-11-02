@@ -68,7 +68,9 @@ fn test_add() {
     // Convert curve `a` field to BigInt
     let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
 
-    let actual = add(P, &a, &p1, &p2);
+    let field: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
+
+    let actual = add(&field, &a, &p1, &p2);
     assert_eq!(actual.x, expected.x);
 }
 
@@ -107,8 +109,9 @@ fn test_double() {
 
     // Convert curve `a` field to BigInt
     let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+    let field: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
 
-    let actual = double(&P, &a, &p1);
+    let actual = double(&field, &a, &p1);
     assert_eq!(actual.x, expected.x);
 }
 
@@ -161,8 +164,9 @@ fn test_multiply_scalar() {
 
     // Convert curve `a` field to BigInt
     let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+    let field: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
 
-    let actual = multiply_scalar(P, &a, &k, &g);
+    let actual = multiply_scalar(&field, &a, &k, &g);
     assert_eq!(actual.x, expected.x);
 }
 
@@ -203,8 +207,9 @@ fn test_multiply_big_scalar() {
 
     // Convert curve `a` field to BigInt
     let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+    let field: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
 
-    let actual = multiply_scalar(P, &a, &k, &p);
+    let actual = multiply_scalar(&field, &a, &k, &p);
     assert_eq!(actual.x, expected.x);
     assert_eq!(actual.y, expected.y);
 }
@@ -249,8 +254,9 @@ fn test_multiply_big_scalar2() {
 
     // Convert curve `a` field to BigInt
     let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+    let field: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
 
-    let actual = multiply_scalar(P, &a, &k, &p);
+    let actual = multiply_scalar(&field, &a, &k, &p);
     assert_eq!(actual.x, expected.x);
     assert_eq!(actual.y, expected.y);
 }
