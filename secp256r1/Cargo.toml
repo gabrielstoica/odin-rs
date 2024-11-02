@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 elliptic_curve_math = { path = "../elliptic_curve_math" }
-num-bigint = "0.4.6"
+num-bigint = { version = "0.4.6", default-features = false }
