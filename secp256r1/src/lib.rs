@@ -30,39 +30,40 @@ pub fn verify_signature_secp256r1(
     r: &String,
     s: &String,
 ) -> bool {
-    // let message_bigint: BigInt = BigInt::parse_bytes(message.as_bytes(), 16).unwrap();
-    // let r_bigint: BigInt = BigInt::parse_bytes(r.as_bytes(), 10).unwrap();
-    // let s_bigint: BigInt = BigInt::parse_bytes(s.as_bytes(), 10).unwrap();
+    let message_bigint: BigInt = BigInt::parse_bytes(message.as_bytes(), 16).unwrap();
+    let r_bigint: BigInt = BigInt::parse_bytes(r.as_bytes(), 10).unwrap();
+    let s_bigint: BigInt = BigInt::parse_bytes(s.as_bytes(), 10).unwrap();
 
-    // let modulus: BigInt = BigInt::parse_bytes(N.as_bytes(), 16).unwrap();
-    // let field: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
+    let modulus: BigInt = BigInt::parse_bytes(N.as_bytes(), 16).unwrap();
+    let field: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
 
-    // // Convert curve `a` field to BigInt
-    // let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
+    // Convert curve `a` field to BigInt
+    let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
 
-    // // Construct the generator point G
-    // let g = Point {
-    //     x: BigInt::parse_bytes(G_X.as_bytes(), 16).unwrap(),
-    //     y: BigInt::parse_bytes(G_Y.as_bytes(), 16).unwrap(),
-    // };
+    // Construct the generator point G
+    let g = Point {
+        x: BigInt::parse_bytes(G_X.as_bytes(), 16).unwrap(),
+        y: BigInt::parse_bytes(G_Y.as_bytes(), 16).unwrap(),
+    };
 
-    // // Construct the Q point
-    // let q = Point {
-    //     x: BigInt::parse_bytes(
-    //         "44287010881208015365891457934322412831709505919103389800494869821653003543448"
-    //             .as_bytes(),
-    //         10,
-    //     )
-    //     .unwrap(),
-    //     y: BigInt::parse_bytes(
-    //         "8406816689267822401861499063555392983685355867895747502381532128270957686385"
-    //             .as_bytes(),
-    //         10,
-    //     )
-    //     .unwrap(),
-    // };
+    // Construct the Q point
+    let q = Point {
+        x: BigInt::parse_bytes(
+            "44287010881208015365891457934322412831709505919103389800494869821653003543448"
+                .as_bytes(),
+            10,
+        )
+        .unwrap(),
+        y: BigInt::parse_bytes(
+            "8406816689267822401861499063555392983685355867895747502381532128270957686385"
+                .as_bytes(),
+            10,
+        )
+        .unwrap(),
+    };
 
-    // let s_inverse = modular_inverse(&s_bigint, &modulus);
+    let s_inverse = modular_inverse(&s_bigint, &modulus);
+    println!("s_inverse: {}", s_inverse);
 
     // let scalar_point_1 = (&s_inverse * message_bigint) % &modulus;
     // let scalar_point_2 = (&s_inverse * &r_bigint) % &modulus;
