@@ -23,7 +23,17 @@ const B: &str = "5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604
 /// [r, s] - signature
 ///
 /// P1 = (s^-1)*message)*G
-pub fn verify_signature_secp256r1(q: &Point, message: &BigInt, r: &BigInt, s: &BigInt) -> bool {
+pub fn verify_signature_secp256r1(
+    pub_x: &String,
+    pub_y: &String,
+    message: &String,
+    r: &String,
+    s: &String,
+) -> bool {
+    let message_bigint: BigInt = BigInt::parse_bytes(message.as_bytes(), 16).unwrap();
+    let r_bigint: BigInt = BigInt::parse_bytes(r.as_bytes(), 10).unwrap();
+    let s_bigint: BigInt = BigInt::parse_bytes(s.as_bytes(), 10).unwrap();
+
     let modulus: BigInt = BigInt::parse_bytes(N.as_bytes(), 16).unwrap();
 
     // Convert curve `a` field to BigInt
@@ -35,24 +45,21 @@ pub fn verify_signature_secp256r1(q: &Point, message: &BigInt, r: &BigInt, s: &B
         y: BigInt::parse_bytes(G_Y.as_bytes(), 16).unwrap(),
     };
 
-    let s_inverse: BigInt = modular_inverse(&s, &modulus);
+    // Construct the Q point
+    let q = Point {
+        x: BigInt::parse_bytes(pub_x.as_bytes(), 10).unwrap(),
+        y: BigInt::parse_bytes(pub_y.as_bytes(), 10).unwrap(),
+    };
 
-    // ok
-    let scalar_point_1 = (&s_inverse * message) % &modulus;
-    println!("scalar 1: {}", scalar_point_1);
+    let s_inverse = modular_inverse(&s_bigint, &modulus);
 
-    // ok
-    let scalar_point_2 = (&s_inverse * r) % &modulus;
-    println!("scalar 2: {}", scalar_point_2);
+    let scalar_point_1 = (&s_inverse * message_bigint) % &modulus;
+    let scalar_point_2 = (&s_inverse * &r_bigint) % &modulus;
 
     let p1 = multiply_scalar(P, &a, &scalar_point_1, &g);
-    println!("p1: {:?}", p1);
     let p2 = multiply_scalar(P, &a, &scalar_point_2, &q);
-    println!("p2: {:?}", p2);
 
     let p3 = add(P, &a, &p1, &p2);
 
-    println!("{:?}", p3);
-
-    return p3.x == *r;
+    return p3.x == r_bigint;
 }
