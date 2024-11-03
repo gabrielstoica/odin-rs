@@ -63,13 +63,12 @@ pub fn verify_signature_secp256r1(
     };
 
     let s_inverse = modular_inverse(&s_bigint, &modulus);
-    // println!("s_inverse: {}", s_inverse);
 
-    // let scalar_point_1 = (&s_inverse * message_bigint) % &modulus;
-    // let scalar_point_2 = (&s_inverse * &r_bigint) % &modulus;
+    let scalar_point_1 = (&s_inverse * message_bigint) % &modulus;
+    let scalar_point_2 = (&s_inverse * &r_bigint) % &modulus;
 
-    // let p1 = multiply_scalar(&field, &a, &scalar_point_1, &g);
-    // let p2 = multiply_scalar(&field, &a, &scalar_point_2, &q);
+    let p1 = multiply_scalar(&field, &a, &scalar_point_1, &g);
+    let p2 = multiply_scalar(&field, &a, &scalar_point_2, &q);
 
     // let p3 = add(&field, &a, &p1, &p2);
 
