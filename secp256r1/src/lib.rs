@@ -58,7 +58,7 @@ pub fn verify_signature_secp256r1(
         .unwrap(),
     };
 
-    /*    let s_inverse = modular_inverse(&s_bigint, &modulus);
+    let s_inverse = modular_inverse(&s_bigint, &modulus);
 
     let scalar_point_1 = (&s_inverse * message_bigint) % &modulus;
     let scalar_point_2 = (&s_inverse * &r_bigint) % &modulus;
@@ -68,6 +68,5 @@ pub fn verify_signature_secp256r1(
 
     let p3 = add(&field, &a, &p1, &p2);
 
-    return p3.x == r_bigint; */
-    return true;
+    return p3.x == r_bigint;
 }
