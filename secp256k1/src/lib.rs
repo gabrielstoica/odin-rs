@@ -47,12 +47,12 @@ pub fn verify_signature_secp256k1(q: &Point, message: &BigInt, r: &BigInt, s: &B
     let scalar_point_2 = (&s_inverse * r) % &modulus;
     println!("scalar 2: {}", scalar_point_2);
 
-    let p1 = multiply_scalar(P, &a, &scalar_point_1, &g);
+    let p1 = multiply_scalar(&modulus, &a, &scalar_point_1, &g);
     println!("p1: {:?}", p1);
-    let p2 = multiply_scalar(P, &a, &scalar_point_2, &q);
+    let p2 = multiply_scalar(&modulus, &a, &scalar_point_2, &q);
     println!("p2: {:?}", p2);
 
-    let p3 = add(P, &a, &p1, &p2);
+    let p3 = add(&modulus, &a, &p1, &p2);
 
     println!("{:?}", p3);
 

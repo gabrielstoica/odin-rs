@@ -51,6 +51,9 @@ fn main() {
     // Convert curve `a` field to BigInt
     let a: BigInt = BigInt::parse_bytes(A.as_bytes(), 16).unwrap();
 
+    // Convert curve field `P` to BigInt
+    let modulus: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
+
     for i in 0..no_of_addresses_to_generate {
         println!(
             "-------------------------------Address #{}-------------------------------",
@@ -68,7 +71,7 @@ fn main() {
         };
 
         // Compute the public key by multiplying the random number k with the generator point G
-        let pub_key_point = multiply_scalar(P, &a, &k, &g);
+        let pub_key_point = multiply_scalar(&modulus, &a, &k, &g);
 
         // Serialize public key as hexadecimal
         let pub_key_x = format!("{:06x}", pub_key_point.x);

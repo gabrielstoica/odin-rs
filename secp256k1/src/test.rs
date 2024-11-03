@@ -92,7 +92,9 @@ fn test_verify_signature_secp256k1() {
         .unwrap()
     );
 
-    let p1 = multiply_scalar(P, &a, &scalar_point_1, &g);
+    let modulus: BigInt = BigInt::parse_bytes(P.as_bytes(), 16).unwrap();
+
+    let p1 = multiply_scalar(&modulus, &a, &scalar_point_1, &g);
     assert_eq!(
         p1.x,
         BigInt::parse_bytes(
@@ -112,7 +114,7 @@ fn test_verify_signature_secp256k1() {
         .unwrap()
     );
 
-    let p2 = multiply_scalar(P, &a, &scalar_point_2, &q);
+    let p2 = multiply_scalar(&modulus, &a, &scalar_point_2, &q);
     assert_eq!(
         p2.x,
         BigInt::parse_bytes(
@@ -132,7 +134,7 @@ fn test_verify_signature_secp256k1() {
         .unwrap()
     );
 
-    let p3 = add(P, &a, &p1, &p2);
+    let p3 = add(&modulus, &a, &p1, &p2);
     assert_eq!(
         p3.x,
         BigInt::parse_bytes(
