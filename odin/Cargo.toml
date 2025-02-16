@@ -9,3 +9,4 @@ description = "A CLI tool for managing Rust-based utilities for Ethereum such as
 clap = { version = "4.5.29", features = ["derive"] }
 address_checksum = { path = "../address_checksum" }
 secp256r1 = { path = "../secp256r1" }
+wallet_generator = { path = "../wallet_generator" }

@@ -1,6 +1,7 @@
 use address_checksum::address_checksum;
 use clap::{Parser, Subcommand};
 use secp256r1::{verify_signature_secp256r1, Secp256r1Args};
+use wallet_generator::generate_wallets;
 
 #[derive(Parser)]
 #[command(name="odin",author, version, about, long_about = None, arg_required_else_help = true)]
@@ -18,6 +19,10 @@ pub enum OdinSubcommand {
     /// Verifies a secp256r1 signature
     #[command(visible_alias = "r1")]
     Secp256r1(Secp256r1Args),
+
+    /// Generates a number of wallets
+    #[command(visible_alias = "g")]
+    GenerateWallets { no_of_addresses_to_generate: usize },
 }
 
 fn main() {
@@ -39,6 +44,11 @@ fn main() {
                 "Signature verification result: {}",
                 if result { "valid" } else { "invalid" }
             );
+        }
+        OdinSubcommand::GenerateWallets {
+            no_of_addresses_to_generate,
+        } => {
+            generate_wallets(no_of_addresses_to_generate);
         }
     }
 }
