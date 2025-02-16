@@ -23,25 +23,7 @@ const B: &str = "000000000000000000000000000000000000000000000000000000000000000
 /// Multiply k with the generator point G, resulting in another point on the curve
 /// which is the public key K.
 /// K = k * G
-fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    // Try to get the first argument which is the number of addresses to generate
-    let arg = match args.get(1) {
-        Some(val) => val,
-        None => "1",
-    };
-
-    // Parse the string argument into integer
-    let no = match arg.parse::<u64>() {
-        Ok(val) => val,
-        Err(e) => {
-            println!("Unable to parse number from argument: {}", e);
-            return;
-        }
-    };
-    let no_of_addresses_to_generate = no as usize;
-
+pub fn generate_wallets(no_of_addresses_to_generate: usize) {
     // Define the total number of points on the curve
     let max_range = BigInt::parse_bytes(N.as_bytes(), 16).unwrap();
 
@@ -62,7 +44,7 @@ fn main() {
 
         // Generate a random number k in range 1 -> number of points on the curve (N)
         let k = rng.gen_bigint_range(&BigInt::from(1), &max_range);
-        println!("Private key: {:x}", k);
+        println!("Private key: {:?}", k);
 
         // Construct the generator point G
         let g = Point {
