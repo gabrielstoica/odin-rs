@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
+use clap::Parser;
 use elliptic_curve_math::{add, modular_inverse, multiply_scalar, Point};
 use num_bigint::BigInt;
 
@@ -17,6 +18,15 @@ const G_Y: &str = "4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf5
 const A: &str = "ffffffff00000001000000000000000000000000fffffffffffffffffffffffc";
 /// b coefficient
 const B: &str = "5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b";
+
+#[derive(Clone, Parser)]
+pub struct Secp256r1Args {
+    pub pub_x: String,
+    pub pub_y: String,
+    pub message: String,
+    pub r: String,
+    pub s: String,
+}
 
 /// Verify a secp256r1 signature based on the public key coordinates, message hash, and signature [r,s] parameters
 pub fn verify_signature_secp256r1(

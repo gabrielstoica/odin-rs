@@ -1,0 +1,12 @@
+[package]
+name = "odin"
+version = "0.1.0"
+edition = "2021"
+authors = ["Gabriel Stoica <marius_gabriel@yahoo.com>"]
+description = "A CLI tool for managing Rust-based utilities for Ethereum such as address checksum, elliptic curve math and wallet generator"
+
+[dependencies]
+clap = { version = "4.5.29", features = ["derive"] }
+address_checksum = { path = "../address_checksum" }
+secp256r1 = { path = "../secp256r1" }
+wallet_generator = { path = "../wallet_generator" }
